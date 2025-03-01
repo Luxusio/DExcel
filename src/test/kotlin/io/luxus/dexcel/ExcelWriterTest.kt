@@ -16,8 +16,8 @@ import org.apache.poi.ss.usermodel.DataFormatter
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRichTextString
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.*
@@ -452,10 +452,12 @@ class ExcelWriterTest: DescribeSpec({
 
             // when, then
             shouldNotThrowAny {
-                ExcelWriter(XSSFWorkbook(), listOf(plugin)).sheet("sheet1") {
-                    row {
-                        cell("A1")
-                        cell("B1")
+                excel(ByteArrayOutputStream(), plugins = listOf(plugin)) {
+                    sheet("sheet1") {
+                        row {
+                            cell("A1")
+                            cell("B1")
+                        }
                     }
                 }
             }

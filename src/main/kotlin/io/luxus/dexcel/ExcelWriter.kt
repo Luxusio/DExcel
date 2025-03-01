@@ -12,6 +12,8 @@ import java.util.Calendar
 import java.util.Date
 
 interface ExcelWriterPlugin {
+    fun beforeWorkbook(writer: ExcelWriter) {}
+    fun afterWorkbook(writer: ExcelWriter) {}
     fun beforeSheet(writer: SheetWriter) {}
     fun afterSheet(writer: SheetWriter) {}
     fun beforeRow(writer: RowWriter) {}
