@@ -67,25 +67,96 @@ class ExcelExtensionsKtTest: DescribeSpec({
             result!!.stringCellValue shouldBeEqual "test"
         }
 
-        table(
-            headers("nullCellName"),
-            row(""),
-            row("A1"),
-            row("A2"),
-            row("B123123123"),
-            row("A123123123"),
-            row("ZZZZZZZ12333445"),
-        ).forAll { nullCellName ->
-            it("$nullCellName should return null") {
-                // given
-                val workbook = XSSFWorkbook()
-                val sheet = workbook.createSheet("sheet1")
+        context("sheet is empty"){
+            table(
+                headers("nullCellName"),
+                row(""),
+                row("A1"),
+                row("A2"),
+                row("B123123123"),
+                row("A123123123"),
+                row("ZZZZZZZ12333445"),
+            ).forAll { nullCellName ->
+                it("$nullCellName should return null") {
+                    // given
+                    val workbook = XSSFWorkbook()
+                    val sheet = workbook.createSheet("sheet1")
 
-                // when
-                val result = sheet.getCell(nullCellName)
+                    // when
+                    val result = sheet.getCell(nullCellName)
 
-                // then
-                result shouldBe null
+                    // then
+                    result shouldBe null
+                }
+            }
+        }
+
+        context("row is empty") {
+            table(
+                headers("nullCellName"),
+                row("A1"),
+                row("B1"),
+                row("AAA1"),
+                row("ZZZAAA1"),
+            ).forAll { nullCellName ->
+                it("$nullCellName should return null") {
+                    // given
+                    val workbook = XSSFWorkbook()
+                    val sheet = workbook.createSheet("sheet1")
+                    sheet.createRow(0)
+
+                    // when
+                    val result = sheet.getCell(nullCellName)
+
+                    // then
+                    result shouldBe null
+                }
+            }
+        }
+
+        context("no row name") {
+            table(
+                headers("nullCellName"),
+                row("A"),
+                row("Z"),
+                row("AA"),
+                row("AZ"),
+                row("AZCBDE"),
+            ).forAll { nullCellName ->
+                it("$nullCellName should return null") {
+                    // given
+                    val workbook = XSSFWorkbook()
+                    val sheet = workbook.createSheet("sheet1")
+
+                    // when
+                    val result = sheet.getCell(nullCellName)
+
+                    // then
+                    result shouldBe null
+                }
+            }
+        }
+
+        context("no cell name") {
+            table(
+                headers("nullCellName"),
+                row("1"),
+                row("123"),
+                row("123123"),
+                row("12222789"),
+                row("123123123"),
+            ).forAll { nullCellName ->
+                it("$nullCellName should return null") {
+                    // given
+                    val workbook = XSSFWorkbook()
+                    val sheet = workbook.createSheet("sheet1")
+
+                    // when
+                    val result = sheet.getCell(nullCellName)
+
+                    // then
+                    result shouldBe null
+                }
             }
         }
     }
