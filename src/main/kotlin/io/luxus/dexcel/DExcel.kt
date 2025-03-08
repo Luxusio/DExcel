@@ -2,6 +2,7 @@ package io.luxus.dexcel
 
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
+import java.io.InputStream
 import java.io.OutputStream
 
 /**
@@ -20,3 +21,7 @@ fun excel(
         write(outputStream)
     }
 }
+
+fun <T> Workbook.read(
+    block: ExcelReader.() -> T
+): T = ExcelReader(this).block()

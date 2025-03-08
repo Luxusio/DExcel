@@ -65,4 +65,34 @@ class DExcelKtTest: DescribeSpec({
             assertEquals("B2", sheet.getRow(1).getCell(1).stringCellValue)
         }
     }
+
+    describe("Workbook.read") {
+        val workbook = XSSFWorkbook()
+        excel(ByteArrayOutputStream(), workbook) {
+            sheet("sheet1") {
+                row {
+                    cell("A1")
+                    cell("B1")
+                }
+                row {
+                    cell("A2")
+                    cell("B2")
+                }
+            }
+        }
+
+        it("should read workbook") {
+            // when
+            val result = workbook.read {
+                sheet("sheet1") {
+                    rows {
+                        strings()
+                    }
+                }
+            }.toList()
+
+            // then
+            assertEquals(listOf(listOf("A1", "B1"), listOf("A2", "B2")), result)
+        }
+    }
 })
