@@ -17,7 +17,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
  */
 class ExcelExtensionsKtTest: DescribeSpec({
     describe("excelColumnIndex") {
-        table(headers("input", "expected"),
+        table(
+            headers("input", "expected"),
             row("A", 0),
             row("B", 1),
             row("Z", 25),
@@ -43,6 +44,36 @@ class ExcelExtensionsKtTest: DescribeSpec({
             it("$invalidInput should throw IllegalArgumentException") {
                 val exception = shouldThrow<IllegalArgumentException> {
                     invalidInput.excelColumnIndex
+                }
+                exception.message shouldNotBe null
+                exception.message!! shouldBeEqual "invalid input: $invalidInput"
+            }
+        }
+    }
+
+    describe("excelColumnName") {
+        table(
+            headers("input", "expected"),
+            row(0, "A"),
+            row(1, "B"),
+            row(25, "Z"),
+            row(26, "AA"),
+            row(27, "AB"),
+            row(51, "AZ"),
+        ).forAll { input, expected ->
+            val result = input.excelColumnName
+            it("excelColumnName of $input should be $expected") {
+                result shouldBeEqual expected
+            }
+        }
+
+        table(
+            headers("invalidInput"),
+            row(-1), // negative
+        ).forAll { invalidInput ->
+            it("$invalidInput should throw IllegalArgumentException") {
+                val exception = shouldThrow<IllegalArgumentException> {
+                    invalidInput.excelColumnName
                 }
                 exception.message shouldNotBe null
                 exception.message!! shouldBeEqual "invalid input: $invalidInput"

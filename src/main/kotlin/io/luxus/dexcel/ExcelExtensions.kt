@@ -26,6 +26,27 @@ val String.excelColumnIndex: Int get() {
     return result - 1 // 0-base 인덱스로 변환합니다.
 }
 
+val Int.excelColumnName: String get() {
+    if (this < 0) {
+        throw IllegalArgumentException("invalid input: $this")
+    }
+
+    val sb = StringBuilder()
+    var n = this + 1
+    while (n > 0) {
+        val r = n % 26
+        if (r == 0) {
+            sb.append('Z')
+            n = n / 26 - 1
+        } else {
+            sb.append('A' + r - 1)
+            n /= 26
+        }
+    }
+
+    return sb.reverse().toString()
+}
+
 /**
  * get cell by cell name
  * @param cellName cell name i.e. A1, B2
