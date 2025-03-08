@@ -42,14 +42,14 @@ class SheetReader(
         return sequence {
             if (endRow < 0) return@sequence
             for (rownum in startRow..endRow) {
-                yield(
-                    RowReader(
-                        sheet.getRow(rownum),
-                        formatter
-                    ).block()
-                )
+                yield(row(rownum, block))
             }
         }
+    }
+
+    fun <T> row(rowNum: Int, block: RowReader.() -> T): T {
+        val row = sheet.getRow(rowNum) ?: throw IllegalArgumentException("Row $rowNum not found")
+        return RowReader(row, formatter).block()
     }
 }
 

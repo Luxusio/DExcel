@@ -9,6 +9,7 @@ import io.kotest.data.table
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.throwable.shouldHaveMessage
 import org.apache.poi.ss.usermodel.DataFormatter
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -255,6 +256,36 @@ class ExcelReaderTest: DescribeSpec({
 
                 it("should return sequence that contains 1 row") {
                     sequence.toList().size shouldBe 1
+                }
+            }
+        }
+
+        describe("row") {
+            val workbook = XSSFWorkbook().apply {
+                ExcelWriter(this, listOf()).sheet("sheet1") {
+                    for (i in 1..20) {
+                        row {
+                            cell("A$i")
+                        }
+                    }
+                }
+            }.getSheet("sheet1")
+
+            val sheetReader = SheetReader(workbook, DataFormatter())
+
+            context("with valid row number") {
+                val result = sheetReader.row(5) { string("A".excelColumnIndex) }
+
+                it("should return RowReader with valid row") {
+                    result shouldBe "A6"
+                }
+            }
+
+            context("with invalid row number") {
+                it("should throw IllegalArgumentException") {
+                    shouldThrow<IllegalArgumentException> {
+                        sheetReader.row(20) { }
+                    } shouldHaveMessage Regex("Row \\d+ not found")
                 }
             }
         }
