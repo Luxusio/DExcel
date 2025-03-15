@@ -68,3 +68,19 @@ fun Sheet.getCell(cellName: String): Cell? {
 
     return this.getRow(row.toInt() - 1)?.getCell(column.excelColumnIndex)
 }
+
+/**
+ * @param excelWidth normal excel width
+ * @return poiWidth
+ */
+val Int.poiPixelToWidth: Int
+    get() {
+        return (42.67 * this).toInt()
+    }
+
+val Double.poiWidthToPoi256Width: Int
+    get() = if (this < 1.0) {
+        469.8 * this + 2.391
+    } else {
+        256.0 * this + 214
+    }.toInt()

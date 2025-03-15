@@ -6,10 +6,13 @@ import io.kotest.data.forAll
 import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
+import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
+import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
 
 /**
  * @author kjkim
@@ -191,4 +194,68 @@ class ExcelExtensionsKtTest: DescribeSpec({
             }
         }
     }
+
+    val pixelToWidth = mutableMapOf<Int, Int>()
+    val poi256WidthToWidthList = mutableListOf<Pair<Double, Int>>()
+    XSSFWorkbook(File("./src/test/resources/ExcelColumnWidth_PoiFont.xlsx").inputStream()).read {
+        sheet("sheet1") {
+            row(0) {
+                for (i in 0..75) {
+                    pixelToWidth[i] = sheet.getColumnWidth(i)
+                    poi256WidthToWidthList += (double(i)!! to sheet.getColumnWidth(i))
+                }
+            }
+        }
+    }
+
+    describe("poiPixelToWidth") {
+        table(
+            headers("input", "minimumValue"),
+            *(0..75).map { row(it, pixelToWidth[it]!!) }.toTypedArray()
+        ).forAll { input, minimumValue ->
+            val result = input.poiPixelToWidth
+
+            it("poi256Width of $input should be between $minimumValue and ${minimumValue + 5}") {
+                result shouldBeGreaterThanOrEqualTo minimumValue
+                result shouldBeLessThanOrEqualTo minimumValue + 5
+            }
+        }
+    }
+
+    describe("poiWidthToPoi256Width") {
+        table(
+            headers("input", "minimumValue"),
+            *(0..75).map { row(
+                poi256WidthToWidthList[it].first,
+                poi256WidthToWidthList[it].second
+            ) }.toTypedArray()
+        ).forAll { input, minimumValue ->
+            val result = input.poiWidthToPoi256Width
+
+            it("poiWidthToPoi256Width of $input should be between $minimumValue and ${minimumValue + 5}") {
+                result shouldBeGreaterThanOrEqualTo minimumValue
+                result shouldBeLessThanOrEqualTo minimumValue + 5
+            }
+        }
+    }
+
+    // excel(File("./src/test/resources/ExcelColumnWidth.xlsx").outputStream()) {
+    //     sheet("pixelToWidth") {
+    //         for (i in 0..75) {
+    //             row {
+    //                 cell(i.toDouble())
+    //                 cell(pixelToWidth[i]!!.toDouble())
+    //             }
+    //         }
+    //     }
+    //
+    //     sheet("poi256WidthToWidth") {
+    //         poi256WidthToWidthList.forEach { (poi256Width, width) ->
+    //             row {
+    //                 cell(poi256Width)
+    //                 cell(width.toDouble())
+    //             }
+    //         }
+    //     }
+    // }
 })
